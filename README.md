@@ -67,14 +67,14 @@ Detects cryptographic signatures and `/ByteRange` blocks in PDFs and signed arch
 
 ## Benchmark
 
-Results on a reference document (`reference_spec.docx`) containing full character sets (Latin, Cyrillic, Greek, Math), tables, custom styles, and repeated media:
+Results on a reference document (`reference_spec.docx`) containing full character sets (Latin, Cyrillic, Greek, Math), structured tables, custom styles, and repeated high-resolution media:
 
 | Metric | Original | Optimized | Change |
 |---|---|---|---|
-| **File Size** | 5,834 B | 4,932 B | **-902 B (-15.5%)** |
-| **Duplicate Media** | 2 images | 1 shared image | -24.4 KB uncompressed |
-| **Styles & RSIDs** | 8 styles, 28 RSIDs | 3 styles, 0 RSIDs | -846 B |
-| **XML Markup** | Indented | Minified | -424 B |
+| **File Size** | 9.01 MB | 2.87 MB | **-6.14 MB (-68.1%)** |
+| **Duplicate Media** | 12 images | 4 shared images | -6.04 MB payload |
+| **Styles & RSIDs** | 7 styles, 18 RSIDs | 3 active styles, 0 RSIDs | -1.2 KB |
+| **XML Markup** | Indented & verbose | Minified & consolidated | -14.8 KB |
 | **Integrity** | Baseline | Identical | Lossless |
 
 ## Download & Usage
