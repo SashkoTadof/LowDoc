@@ -1,93 +1,99 @@
 # LowDoc
 
-Aggressive, 100% lossless document and image optimizer in native C++20.
+Lossless document and image optimizer written in native C++20.
+
+LowDoc strips hidden bloat, duplicate assets, redundant metadata, and recompresses internal streams across modern documents without losing a single pixel, vector, or formatting detail.
 
 ## Features
 
-### Native RFC 1951 Deflate Engine
-Custom-built LZ77 compressor with adaptive sliding-window search, static and dynamic canonical Huffman trees, and candidate-race evaluation between optimal Deflate and uncompressed Store passes.
+### Custom Deflate Engine
+Built-in RFC 1951 LZ77 and Huffman compressor. Evaluates multiple compression strategies in memory and selects the smallest valid bitstream.
 
-### Multi-Format Deep Optimization
-Surgical container and content cleanup across 17 formats: OOXML (`DOCX`, `XLSX`, `PPTX`, macros & templates), `PDF`, OpenDocument (`ODT`, `ODS`, `ODP`), `EPUB`, `RTF`, and vector/raster graphics (`PNG`, `JPEG`, `SVG`).
+### Multi-Format Support
+Cleans and optimizes 17 file formats out of the box:
+- **Office**: DOCX, XLSX, PPTX, DOTX, XLTX, POTX, XLAM, DOCM, PPTM
+- **OpenDocument**: ODT, ODS, ODP
+- **Documents & Books**: PDF, EPUB, RTF
+- **Images**: PNG, JPEG, SVG
 
-### Package & Asset Deduplication
-Automatic SHA-256 media hashing and content deduplication across internal parts, pruning unused Word/Excel styles, RSID edit tracking history, redundant XML namespaces, and orphaned relationships.
+### Asset Deduplication & Cleanup
+- Detects identical embedded images, fonts, and media via SHA-256 and merges them into shared references.
+- Strips editing history (RSID tags), unused styles, orphaned relationships, and redundant namespaces.
+- Minifies internal XML markup while safely preserving whitespace in formatted text.
 
-### Digital Signature Protection
-Built-in security guards for PDF and signed archives: detects `/ByteRange` signatures and cryptographic sign-blocks, immediately halting modifications to guarantee integrity and avoid breaking digital seals.
+### Digital Signature Guard
+Detects cryptographic signatures and `/ByteRange` blocks in PDFs and signed archives, leaving them untouched to avoid breaking document seals.
 
-## More Highlights
+## Highlights
 
-- **Strictly Lossless**: Zero compromise on fidelity. Preserves identical visual rendering, vector geometry, fonts, formatting, unicode strings, and exact decoded pixel buffers.
-- **Native Win32 GUI**: Ultra-compact desktop interface written in pure Win32 API. Zero Electron, zero WebViews, zero bloated runtime frameworks.
-- **Context Menu Integration**: Optional right-click integration in Windows Explorer ("Compress with LowDoc") with an unobtrusive progress HUD.
-- **Dark & Light Mode Adaptation**: Matches system visual styles automatically with Segoe UI typography and dark-mode DWM window frames.
-- **Zero Bloat & Zero Telemetry**: Portable standalone binaries, completely offline, zero background services, zero external DLL dependencies.
-- **Safe Output Policy**: Never destroys your original file. Saves output as `filename.lowdoc.<ext>` with automatic incrementing collision avoidance.
+- **100% Lossless**: Identical visual output, exact fonts, full Unicode text, and pixel-perfect images.
+- **Native Win32 GUI**: Clean desktop interface in pure Win32. No Electron, no WebViews, no heavy runtimes.
+- **Explorer Context Menu**: Right-click any file to compress it with a quick progress HUD.
+- **Dark Mode Support**: Follows Windows system theme with native Segoe UI typography and DWM title bar styling.
+- **Zero Bloat & Offline**: Standalone binaries with no external DLLs, no background services, and zero telemetry.
+- **Non-Destructive**: Keeps your original file safe, saving output as `filename.lowdoc.<ext>`.
 
 ## Screenshots
 
 <p align="center">
   <img src="docs/screenshots/optimized_result.png" alt="LowDoc Desktop GUI" width="480">
   <br>
-  <em>Native Win32 GUI with optimization metrics and reduction statistics</em>
+  <em>Native Win32 GUI with optimization metrics</em>
 </p>
 
 <p align="center">
   <img src="docs/screenshots/context_progress_hud.png" alt="LowDoc Context Menu Progress HUD" width="420">
   <br>
-  <em>Unobtrusive context-menu progress HUD with instant feedback</em>
+  <em>Explorer context-menu progress HUD</em>
 </p>
 
 ## Architecture
 
-LowDoc is structured into standalone, decoupled native components:
+- **`lowdoc_core`**: Static engine library (Deflate, ZIP parser/serializer, XML parsers, format detectors, asset deduplicator).
+- **`lowdoc.exe`**: Multi-threaded CLI tool for batch processing and scripts.
+- **`lowdoc_gui.exe`**: Win32 GUI with drag-and-drop, real-time stats, and Explorer context menu integration.
 
-- **`lowdoc_core`**: Static engine library containing RFC 1951 Deflate, ZIP container serializer, XML/HTML stream parsers, format detectors, asset deduplicator, and format optimizers.
-- **`lowdoc.exe`**: High-performance CLI tool with multi-threading, recursive directory traversal, batch processing, and machine-readable JSON telemetry.
-- **`lowdoc_gui.exe`**: Lightweight native Win32 GUI featuring drag-and-drop, real-time metrics, Explorer context menu registry integration, and system theme adaptation.
+## How It Works
 
-## How it works
-
-1. **Format Detection**: Inspects leading magic bytes and container manifests rather than relying strictly on file extensions.
-2. **Decontainerization**: Unpacks ZIP/OPC archives and parses internal object graphs into memory streams.
-3. **Pass Orchestration**:
-   - Strips edit tracking metadata, redundant RSID identifiers, and application thumbnails.
-   - Normalizes and minifies internal XML markup while strictly respecting `xml:space="preserve"`.
-   - Hashes and deduplicates shared media assets (images, fonts, sounds) and rewires relationship targets.
-   - Prunes unused built-in and orphaned user styles.
-4. **Multi-Candidate Race**: Compresses streams across competing configurations (Fast, Maximum, Dynamic Huffman, Store), comparing resulting bitstreams byte-for-byte.
-5. **Strict Validation**: Decodes the winning candidate through built-in validators; if integrity fails or no space was saved, the original file is preserved byte-identical.
+1. **Format Check**: Identifies the format by file magic bytes, not just the file extension.
+2. **Unpacking**: Reads internal archives and object trees directly in memory.
+3. **Cleaning Passes**:
+   - Removes RSID edit markers, thumbnails, and revision clutter.
+   - Cleans unused styles and redundant XML namespaces.
+   - Merges identical images and shared media.
+   - Normalizes and minifies XML markup.
+4. **Stream Compression**: Recompresses data streams using optimal Deflate passes.
+5. **Validation**: Verifies package integrity before saving. If no bytes are saved, the original file is left as-is.
 
 ## Benchmark
 
-Evaluation on a comprehensive reference document (`reference_spec.docx`) containing full character sets (Latin, Cyrillic, Greek, Math), structured tables, nested styles, lists, and repeated media assets:
+Results on a reference document (`reference_spec.docx`) containing full character sets (Latin, Cyrillic, Greek, Math), tables, custom styles, and repeated media:
 
-| Metric | Original | Optimized | Delta |
+| Metric | Original | Optimized | Change |
 |---|---|---|---|
 | **File Size** | 5,834 B | 4,932 B | **-902 B (-15.5%)** |
-| **Media Deduplication** | 2 unique streams | 1 shared stream | -24.4 KB payload uncompressed |
-| **Styles & RSIDs** | 8 styles, 28 RSID tags | 3 active styles, 0 RSIDs | -846 B |
-| **XML Structure** | Verbose formatting | Normalized & minified | -424 B |
-| **Visual Integrity** | Baseline | 100% Bit-Identical | Verified Lossless |
+| **Duplicate Media** | 2 images | 1 shared image | -24.4 KB uncompressed |
+| **Styles & RSIDs** | 8 styles, 28 RSIDs | 3 styles, 0 RSIDs | -846 B |
+| **XML Markup** | Indented | Minified | -424 B |
+| **Integrity** | Baseline | Identical | Lossless |
 
 ## Download & Usage
 
-Get the latest release from [Releases](https://github.com/SashkoTadof/LowDoc/releases).
+Get the latest build from [Releases](https://github.com/SashkoTadof/LowDoc/releases).
 
 ### GUI
-Launch `lowdoc_gui.exe`, drag and drop files directly, or toggle the Explorer context menu option for one-click document compression.
+Run `lowdoc_gui.exe` and drop your files into the window, or right-click files in Windows Explorer.
 
 ### CLI
 ```powershell
-# Optimize a single document
+# Optimize a single file
 lowdoc document.docx
 
-# Custom destination path
-lowdoc document.docx -o optimized.docx
+# Save to a specific path
+lowdoc document.docx -o output.docx
 
-# Batch optimize entire directory recursively
-lowdoc ./reports --recursive
+# Optimize a folder recursively
+lowdoc ./documents --recursive
 
 # Output JSON summary
 lowdoc document.docx --json
@@ -96,10 +102,10 @@ lowdoc document.docx --json
 lowdoc document.docx --quiet
 ```
 
-## Requirements & Notes
+## Requirements
 
-- **OS**: Windows 10 / 11 64-bit (or Linux for CLI builds).
-- **Permissions**: Standard user permissions (registry write access for current user when toggling the context menu).
+- **OS**: Windows 10 / 11 64-bit (or Linux for CLI).
+- **Permissions**: Standard user account (writes to user registry only when enabling the context menu).
 
 ## Build
 
@@ -110,7 +116,7 @@ cmake -B build -S .
 cmake --build build --config Release
 ```
 
-Output binaries will be generated in `build/Release/`:
+Binaries will be in `build/Release/`:
 - `lowdoc.exe`
 - `lowdoc_gui.exe`
 - `lowdoc_test.exe`
