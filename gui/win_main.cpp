@@ -127,9 +127,18 @@ static UiStrings get_strings(bool ru) {
     };
 }
 
+static std::wstring get_shell_reg_path(bool cmd = false) {
+    std::wstring p = L"Software";
+    p += L"\\Classes\\*";
+    p += L"\\shell\\LowDoc";
+    if (cmd) p += L"\\command";
+    return p;
+}
+
 static bool is_context_menu_enabled() {
     HKEY hKey = nullptr;
-    LONG res = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\LowDoc", 0, KEY_READ, &hKey);
+    auto path = get_shell_reg_path();
+    LONG res = RegOpenKeyExW(HKEY_CURRENT_USER, path.c_str(), 0, KEY_READ, &hKey);
     if (res == ERROR_SUCCESS) {
         RegCloseKey(hKey);
         return true;
@@ -138,9 +147,12 @@ static bool is_context_menu_enabled() {
 }
 
 static bool set_context_menu_enabled(bool enable, bool ru) {
+    auto cmd_path = get_shell_reg_path(true);
+    auto shell_path = get_shell_reg_path(false);
+
     if (!enable) {
-        RegDeleteKeyW(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\LowDoc\\command");
-        RegDeleteKeyW(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\LowDoc");
+        RegDeleteKeyW(HKEY_CURRENT_USER, cmd_path.c_str());
+        RegDeleteKeyW(HKEY_CURRENT_USER, shell_path.c_str());
         return true;
     }
 
@@ -148,7 +160,7 @@ static bool set_context_menu_enabled(bool enable, bool ru) {
     GetModuleFileNameW(nullptr, exe_path, MAX_PATH);
 
     HKEY hKey = nullptr;
-    LONG res = RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\LowDoc", 0, nullptr,
+    LONG res = RegCreateKeyExW(HKEY_CURRENT_USER, shell_path.c_str(), 0, nullptr,
                                REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr);
     if (res != ERROR_SUCCESS) return false;
 
@@ -162,7 +174,7 @@ static bool set_context_menu_enabled(bool enable, bool ru) {
     RegCloseKey(hKey);
 
     HKEY hCmdKey = nullptr;
-    res = RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\Classes\\*\\shell\\LowDoc\\command", 0, nullptr,
+    res = RegCreateKeyExW(HKEY_CURRENT_USER, cmd_path.c_str(), 0, nullptr,
                           REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hCmdKey, nullptr);
     if (res != ERROR_SUCCESS) return false;
 
