@@ -1,29 +1,33 @@
-#include "resource.h"
 #include <windows.h>
+#include "resource.h"
 
 IDI_APP_ICON ICON "app_icon.ico"
 
-VS_VERSION_INFO VERSIONINFO
-FILEVERSION     1,0,0,0
-PRODUCTVERSION  1,0,0,0
-FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       0
-FILEOS          VOS_NT_WINDOWS32
-FILETYPE        VFT_APP
-FILESUBTYPE     VFT2_UNKNOWN
+1 VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904b0"
+        BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName",      "SashkoTadof"
-            VALUE "FileDescription",  "LowDoc - Lossless Document Optimizer"
-            VALUE "FileVersion",      "1.0.0.0"
-            VALUE "InternalName",     "LowDoc"
-            VALUE "LegalCopyright",   "Copyright (C) 2026 SashkoTadof. MIT License."
+            VALUE "CompanyName", "SashkoTadof"
+            VALUE "FileDescription", "LowDoc lossless document optimization"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "lowdoc"
             VALUE "OriginalFilename", "lowdoc.exe"
-            VALUE "ProductName",      "LowDoc"
-            VALUE "ProductVersion",   "1.0.0.0"
+            VALUE "ProductName", "LowDoc"
+            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 SashkoTadof. All rights reserved."
         END
     END
     BLOCK "VarFileInfo"
