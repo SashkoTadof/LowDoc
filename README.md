@@ -38,13 +38,13 @@ Detects cryptographic signatures and `/ByteRange` blocks in PDFs and signed arch
 <p align="center">
   <img src="docs/screenshots/optimized_result.png" alt="LowDoc Desktop GUI" width="480">
   <br>
-  <em>Native Win32 GUI with optimization metrics</em>
+  <em></em>
 </p>
 
 <p align="center">
   <img src="docs/screenshots/context_progress_hud.png" alt="LowDoc Context Menu Progress HUD" width="420">
   <br>
-  <em>Explorer context-menu progress HUD</em>
+  <em></em>
 </p>
 
 ## Architecture
