@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(MSVC)
-    add_compile_options(/W4 /WX- /O2 /permissive- /utf-8)
+    add_compile_options(/W4 /WX- /O2 /permissive- /utf-8 /GS /guard:cf)
+    add_link_options(/DYNAMICBASE /NXCOMPAT /GUARD:CF)
 endif()
 
 set(LOWDOC_CORE_SOURCES
