@@ -1,0 +1,15 @@
+build/
+bin/
+out/
+.vs/
+*.user
+*.obj
+*.exe
+*.lib
+*.pdb
+*.ilk
+*.log
+*.tmp
+.codegraph/
+.DS_Store
+Thumbs.db
